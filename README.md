@@ -5,12 +5,12 @@ For each person pose annotations are added to the output videos.
 
 ##  Setup
 
-1. Clone the repository
+- Clone the repository
 ```
 $ git clone https://github.com/mrcharlie90/multiview-people-recognition.git --recursive
 ```
 
-2. Open MATLAB and install toolbox
+- Open MATLAB and install toolbox
 ```
 > addpath(genpath('path/to/toolbox/')); 
 > savepath;
