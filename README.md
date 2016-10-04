@@ -28,12 +28,12 @@ For each person pose annotations are added to the output videos.
     $ python setup.py install
    ```
 
-```
+   ```
      issue: sementation fault 11
      sol: export
      /usr/local/Cellar/python/2.7.12/Frameworks/Python.framework/Versions/2.7/lib/
      to the DYLD_LIBRARY_PATH
-```
+    ```
 
 ### work in progress...stay tuned!
 
