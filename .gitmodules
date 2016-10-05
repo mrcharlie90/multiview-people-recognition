@@ -1,3 +1,6 @@
 [submodule "toolbox"]
 	path = toolbox
 	url = https://github.com/pdollar/toolbox.git
+[submodule "deepcut-cnn"]
+	path = deepcut-cnn
+	url = https://github.com/eldar/deepcut-cnn.git
