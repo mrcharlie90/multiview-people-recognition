@@ -69,7 +69,7 @@ print 'done!'
 # Process each image with the detector
 print 'Detecting people...'
 eng = matlab.engine.start_matlab()
-eng.detect(video_folder, numdetector, 0, nargout=0)
+eng.detect(video_folder, numdetector, 1, nargout=0)
 print 'done!'
 
 # Convert resulting images to video
@@ -79,6 +79,9 @@ subprocess.call(['ffmpeg', '-hide_banner','-y',
                  '-i', video_out_folder + video_name + '-%03d.png',
                  '-r', rate, video_out_folder + vout])
 print 'done! Results stored in ' + video_out_folder
+
+# Computing skeletal tracking
+
 
 
 ### End Main ###
