@@ -8,8 +8,13 @@
 ehthumbs.db
 Thumbs.db
 *.m~
+*.avi
 *.png
 *.jpeg
 *.npz
 *.pyc
 *.txt
+.idea/
+data/
+models/ResNet-152.caffemodel
+models/ResNet-152.prototxt
