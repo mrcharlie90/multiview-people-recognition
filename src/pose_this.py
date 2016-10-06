@@ -20,6 +20,8 @@ parser.add_argument('-r', metavar='rate_value', nargs='?', default='1',
 parser.add_argument('-numdetector', metavar='number', nargs='?', default=2,
                     help='detector number')
 
+parser.add_argument('')
+
 parser.add_argument('--version', action='version', version='%(prog)s 1.0')
 
 args = parser.parse_args()
@@ -66,6 +68,11 @@ subprocess.call(['ffmpeg', '-hide_banner','-y',
                   video_folder + video_name + '-%03d.png'])
 print 'done!'
 
+
+
+
+
+
 # Process each image with the detector
 print 'Detecting people...'
 eng = matlab.engine.start_matlab()
@@ -81,6 +88,8 @@ subprocess.call(['ffmpeg', '-hide_banner','-y',
 print 'done! Results stored in ' + video_out_folder
 
 # Computing skeletal tracking
+
+
 
 
 

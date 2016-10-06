@@ -5,9 +5,9 @@ function detect(images_path, det_number, crop)
     % Pre-trained models
     detectors = {
         '../toolbox/detector/models/AcfCaltech+Detector.mat' 
-        '../toolbox/detector/models/AcfInriaDetector.mat' % <-- best
+        '../toolbox/detector/models/AcfInriaDetector.mat' % <-- best small 
         '../toolbox/detector/models/LdcfCaltechDetector.mat' 
-        '../toolbox/detector/models/LdcfInriaDetector.mat'
+        '../toolbox/detector/models/LdcfInriaDetector.mat' % <-- best big
         };
     
     % Detector loading
@@ -31,9 +31,7 @@ function detect(images_path, det_number, crop)
     end
     
     % Detect people
-    for i=1:nfiles
-        
-        
+    for i=1:nfiles      
         % Read the image and detect people
         img = imread([images_path imagefiles(i).name]);
         bbs = acfDetect(img, detector);
