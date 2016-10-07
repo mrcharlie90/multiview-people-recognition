@@ -9,5 +9,5 @@ class Toolbox:
         self.eng = matlab.engine.start_matlab()
         self.eng.setup(nargout=0)
 
-    def detect(self, in_image, out_folder):
+    #def detect(self, in_image, out_folder):
 
