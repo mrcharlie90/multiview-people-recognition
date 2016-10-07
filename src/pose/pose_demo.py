@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Pose predictions in Python.
+Pose predictions in Python. [ADAPTED VERSION]
 
 Caffe must be available on the Pythonpath for this to work. The methods can
 be imported and used directly, or the command line interface can be used. In
@@ -31,6 +31,7 @@ def _npcircle(image, cx, cy, radius, color, transparency=0.0):
     radius = int(radius)
     cx = int(cx)
     cy = int(cy)
+    #print 'r: ', radius, ' cx: ', cx, ' cy: ', cy
     y, x = _np.ogrid[-radius: radius, -radius: radius]
     index = x**2 + y**2 <= radius**2
     image[cy-radius:cy+radius, cx-radius:cx+radius][index] = (
@@ -72,6 +73,8 @@ def _npcircle(image, cx, cy, radius, color, transparency=0.0):
                type=_click.INT,
                help='GPU device id.',
                default=0)
+
+
 def predict_pose_from(image_name,
                       out_name=None,
                       scales='1.',
@@ -85,8 +88,8 @@ def predict_pose_from(image_name,
     `IMAGE_NAME` may be an image or a directory, for which all images with
     `folder_image_suffix` will be processed.
     """
-    model_def = '../../models/ResNet-152.prototxt'
-    model_bin = '../../models/ResNet-152.caffemodel'
+    model_def = '../models/ResNet-152.prototxt'
+    model_bin = '../models/ResNet-152.caffemodel'
     scales = [float(val) for val in scales.split(',')]
     if _os.path.isdir(image_name):
         folder_name = image_name[:]
@@ -107,7 +110,11 @@ def predict_pose_from(image_name,
         _os.mkdir(out_name)
     for image_name in images:
         if out_name_provided is None:
-            out_name = image_name + '_pose.npz'
+            dir_name = _os.path.split(image_name)[0]
+            file_name = _os.path.split(dir_name)[1]
+
+            out_name = _os.path.join(dir_name, file_name) + '_pose.npz'
+
         elif process_folder:
             out_name = _os.path.join(out_name_provided,
                                      _os.path.basename(image_name) + '_pose.npz')
@@ -118,8 +125,13 @@ def predict_pose_from(image_name,
             _LOGGER.warn("The image is grayscale! This may deteriorate performance!")
             image = _np.dstack((image, image, image))
         else:
-            image = image[:, :, ::-1]    
+            image = image[:, :, ::-1]
+
+
         pose = estimate_pose(image, model_def, model_bin, scales)
+
+        print out_name
+
         _np.savez_compressed(out_name, pose=pose)
         if visualize:
             visim = image[:, :, ::-1].copy()
@@ -127,15 +139,11 @@ def predict_pose_from(image_name,
                       [255, 0, 0],[0, 255, 0],[0, 0, 255],[0,245,255],[255,131,250],[255,255,0],
                       [0,0,0],[255,255,255]]
             for p_idx in range(14):
-                _npcircle(visim,
-                          pose[0, p_idx],
-                          pose[1, p_idx],
-                          8,
-                          colors[p_idx],
-                          0.0)
-            vis_name = out_name + '_vis.png'
+                _npcircle(visim, pose[0, p_idx], pose[1, p_idx], 1, colors[p_idx], 0.0)
+            dir_name = _os.path.split(image_name)[0]
+            file_name = _os.path.split(dir_name)[1]
+            vis_name = _os.path.join(dir_name, file_name) + '_vis.png'
             _scipy.misc.imsave(vis_name, visim)
-
 
 if __name__ == '__main__':
     _logging.basicConfig(level=_logging.INFO)
