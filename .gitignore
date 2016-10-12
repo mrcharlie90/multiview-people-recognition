@@ -15,7 +15,12 @@ Thumbs.db
 *.pyc
 *.txt
 *.mat
+*.mexa64
+*.mexmaci64
+*.mexw64
 .idea/
 data/**
 models/ResNet-152.caffemodel
+!filtered-channel-features
+filtered-channel-features/**/*.mexmaci64
 
