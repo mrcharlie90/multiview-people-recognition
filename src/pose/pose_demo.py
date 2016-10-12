@@ -19,6 +19,8 @@ import glob as _glob
 import numpy as _np
 import scipy as _scipy
 import click as _click
+
+_os.environ['GLOG_minloglevel'] = '2'  # comment when debugging
 import caffe as _caffe
 
 from estimate_pose import estimate_pose
@@ -126,24 +128,20 @@ def predict_pose_from(image_name,
             image = _np.dstack((image, image, image))
         else:
             image = image[:, :, ::-1]
-
-
         pose = estimate_pose(image, model_def, model_bin, scales)
 
-        print out_name
-
         _np.savez_compressed(out_name, pose=pose)
-        if visualize:
-            visim = image[:, :, ::-1].copy()
-            colors = [[255, 0, 0],[0, 255, 0],[0, 0, 255],[0,245,255],[255,131,250],[255,255,0],
-                      [255, 0, 0],[0, 255, 0],[0, 0, 255],[0,245,255],[255,131,250],[255,255,0],
-                      [0,0,0],[255,255,255]]
-            for p_idx in range(14):
-                _npcircle(visim, pose[0, p_idx], pose[1, p_idx], 1, colors[p_idx], 0.0)
-            dir_name = _os.path.split(image_name)[0]
-            file_name = _os.path.split(dir_name)[1]
-            vis_name = _os.path.join(dir_name, file_name) + '_vis.png'
-            _scipy.misc.imsave(vis_name, visim)
+        # if visualize:
+        #     visim = image[:, :, ::-1].copy()
+        #     colors = [[255, 0, 0],[0, 255, 0],[0, 0, 255],[0,245,255],[255,131,250],[255,255,0],
+        #               [255, 0, 0],[0, 255, 0],[0, 0, 255],[0,245,255],[255,131,250],[255,255,0],
+        #               [0,0,0],[255,255,255]]
+        #     for p_idx in range(14):
+        #         _npcircle(visim, pose[0, p_idx], pose[1, p_idx], 1, colors[p_idx], 0.0)
+        #     dir_name = _os.path.split(image_name)[0]
+        #     file_name = _os.path.split(dir_name)[1]
+        #     vis_name = _os.path.join(dir_name, file_name) + '_vis.png'
+        #     _scipy.misc.imsave(vis_name, visim)
 
 if __name__ == '__main__':
     _logging.basicConfig(level=_logging.INFO)

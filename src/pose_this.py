@@ -5,6 +5,7 @@
 
 import os
 import argparse
+import numpy as np
 
 from toolbox import Toolbox
 from skeltracker import SkeletalTracker
@@ -56,10 +57,13 @@ if not os.path.exists(res_path):
 # Apply detection and pose estimation for each image
 t = Toolbox()
 st = SkeletalTracker("./pose/pose_demo.py")
+
+rounds = 10
+i = 0
 # For each image specified do
 for img in imgs:
     # Detection
-    bbs_path = t.detect(img, res_path, 2)
+    bbs_path = t.detect(img, res_path, 4)
     # For each people detected do pose estimation
     for patch in list(os.listdir(bbs_path)):
         patch_path = os.path.join(bbs_path, patch)
@@ -68,8 +72,9 @@ for img in imgs:
 
             if splitting[1] == img_ext:
                 st.skeletonize(['--use_cpu'], patch_path, bbs_path)
-
-
+    i += 1
+    if i == rounds:
+        break
 
 # Close the matlab engine
 t.close()

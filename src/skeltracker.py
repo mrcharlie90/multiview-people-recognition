@@ -7,6 +7,7 @@ class SkeletalTracker:
         self.path = path
 
     def skeletonize(self, params, input_image, output_dir):
+        """ Compute the skeleton of the person in the image """
         st_path = os.path.abspath(self.path)
         command = [st_path] # pose_demo.py
         print input_image
@@ -17,3 +18,5 @@ class SkeletalTracker:
 
 
         subp.call(command)
+
+
