@@ -87,7 +87,9 @@ def estimate_pose(image, model_def, model_bin, scales=None):  # pylint: disable=
         im_bg_height = int(_np.ceil(
             float(image.shape[0]) * scale_factor / _STRIDE) * _STRIDE)
         pad_size = 64
-        im_bot_pixels = image[-1:, :, :]
+
+        # Padding by duplicating borders (bottom and right ones) 64 times
+        im_bot_pixels = image[-1:, :, :]  # bottom
         im_bot = _np.tile(im_bot_pixels, (pad_size, 1, 1))
         image = _np.vstack((image, im_bot))
         im_right_pixels = image[:, -1:, :]

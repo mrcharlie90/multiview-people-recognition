@@ -5,14 +5,15 @@
 %
 % images_path : path to the image
 % output_dir : path where to store the results
+% out_name : where the cropped detection are stored
 % det_number : detection number
 % padding : resize all rectangles detected adding this value
 % thresh : selects rectangles with score >= thresh
 %
 % example:
-% detector('../data/terrace/terrace1-c0-026.png', '../res/terrace', 'chk', 10, 90.0);
+% detector('../data/terrace/terrace1-c0-026.png', '../res/terrace', '1', 7, 10, 90.0);
 %
-function bbs_dir = detector(input_image, output_dir, det_number, padding, thresh)
+function bbs_dir = detector(input_image, out_dir, out_filename, det_number, padding, thresh)
     % Pre-trained models
     detectors = {
         '../toolbox/detector/models/AcfCaltech+Detector.mat' 
@@ -24,31 +25,26 @@ function bbs_dir = detector(input_image, output_dir, det_number, padding, thresh
         '../filtered-channel-features/models_Caltech/Checkerboards/Checkerboards_works.mat'
         };
     
-    % Choosing detector
-%     det_number = 0;
-%     if strcmp(mode, 'acf') == 1
-%         addpath(genpath('../toolbox/'));
-%         det_number = 4;
-%     elseif strcmp(mode, 'chk') == 1
-%         addpath(genpath('../filtered-channel-features/'));
-%         det_number = 7;
-%     else
-%         display('Invalid mode. Choose one from acf chk');
-%         return;
-%     end
-    
     % Detector loading
     detector_path = detectors{det_number};
     detector = load(detector_path);
     detector = detector.detector;
     
     % Checking if the output dir exists
-    if ~exist(output_dir, 'dir')
-        mkdir(output_dir);
+    if ~exist(out_dir, 'dir')
+        mkdir(out_dir);
     end
     
     [pathstr, filename, ext] = fileparts(input_image);
-    bbs_dir = [output_dir '/' filename '/'];
+    if strcmp(out_filename, '') == 1 
+        bbs_dir = [out_dir '/' filename '/'];
+        out_name = [out_dir '/' filename ext];
+        out_bbs_name = [out_dir '/' filename '_bbs'];
+    else
+        bbs_dir = [out_dir '/' out_filename '/'];
+        out_name = [out_dir '/' out_filename ext];
+        out_bbs_name = [out_dir '/' out_filename '_bbs'];
+    end
     
     if ~exist(bbs_dir, 'dir')
         mkdir(bbs_dir);
@@ -90,8 +86,6 @@ function bbs_dir = detector(input_image, output_dir, det_number, padding, thresh
     
     % Save the image
     img_out = bbApply('embed', img, bbs, 'col', [0 255 0]);
-    out_name = [output_dir '/' filename '_dect' ext];
-    out_bbs_name = [bbs_dir filename '_bbs'];
     imwrite(img_out, out_name);
     save(out_bbs_name, 'bbs');
     
@@ -99,7 +93,7 @@ function bbs_dir = detector(input_image, output_dir, det_number, padding, thresh
     [patches, bb] = bbApply('crop', img, bbs);
     
     for i=1:length(patches)
-        patch_name = [bbs_dir filename '_crop' int2str(i) ext];
+        patch_name = [bbs_dir int2str(i) ext];
         imwrite(patches{i}, patch_name);
     end
     

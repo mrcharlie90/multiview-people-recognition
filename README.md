@@ -4,9 +4,8 @@ The aim of this program is to simply acquire camera recordings and successively 
 For each person pose annotations are added to the output videos.
 
 ## Requirements
-  * MATLAB (tested with 2015b) 
+  * MATLAB (tested with 2015b) (better with Parallel Toolbox package)
   * Python 2.7
-  * ~~FFmpeg (http://ffmpeg.org)~~
 
 ##  Setup
 
@@ -32,8 +31,7 @@ For each person pose annotations are added to the output videos.
 
    ```
      issue: sementation fault 11
-     sol: export
-     /usr/local/Cellar/python/2.7.12/Frameworks/Python.framework/Versions/2.7/lib/
+     sol: export /usr/local/Cellar/python/2.7.12/Frameworks/Python.framework/Versions/2.7/lib/
      to the DYLD_LIBRARY_PATH
    ```
 

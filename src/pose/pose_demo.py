@@ -102,20 +102,23 @@ def predict_pose_from(image_name,
     else:
         images = [image_name]
         process_folder = False
+
     if use_cpu:
         _caffe.set_mode_cpu()
     else:
         _caffe.set_mode_gpu()
         _caffe.set_device(gpu)
+
     out_name_provided = out_name
     if process_folder and out_name is not None and not _os.path.exists(out_name):
         _os.mkdir(out_name)
     for image_name in images:
+        print image_name
         if out_name_provided is None:
-            dir_name = _os.path.split(image_name)[0]
-            file_name = _os.path.split(dir_name)[1]
-
-            out_name = _os.path.join(dir_name, file_name) + '_pose.npz'
+            splitting = _os.path.split(image_name)
+            file_name = splitting[1].split('.')[0]
+            out_name = _os.path.join(splitting[0], file_name + '.npz')
+            print out_name
 
         elif process_folder:
             out_name = _os.path.join(out_name_provided,

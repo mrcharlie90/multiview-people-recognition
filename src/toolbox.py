@@ -53,7 +53,6 @@ class Toolbox:
 
         self.eng.detector_parallel(input_dir, output_dir, ext, det_num, 10, 90.0, nargout=0)
 
-
     def close(self):
         """Close the engine"""
         self.eng.quit()

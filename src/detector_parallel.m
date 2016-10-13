@@ -6,7 +6,7 @@
 % example:
 % detector_parallel('../data/terrace/', '../res/terrace/', 'png', 'chk', 10, 90);
 %
-function detector_parallel(in_path, out_path, in_ext, mode, padding, thresh)
+function detector_parallel(in_path, out_path, in_ext, det_num, padding, thresh)
 %     in_path = '../data/terrace/';
 %     in_ext = 'png';
 %     out_path = '../res/terrace/';
@@ -32,7 +32,7 @@ function detector_parallel(in_path, out_path, in_ext, mode, padding, thresh)
     parfor i=1:length(theFiles)
         baseFileName = theFiles(i).name;
         fullFileName = fullfile(in_path, baseFileName);
-        detector(fullFileName, out_path, mode, padding, thresh);
+        detector(fullFileName, out_path, int2str(i), det_num, padding, thresh);
     end
     delete(poolobj);
 end

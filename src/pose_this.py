@@ -4,8 +4,9 @@
 #
 
 import os
-import argparse
 import numpy as np
+import argparse
+import glob
 
 from toolbox import Toolbox
 from skeltracker import SkeletalTracker
@@ -15,9 +16,9 @@ parser = argparse.ArgumentParser(usage='pose_this.py path/to/video.avi ',
                                  description='Take a video with people moving and output \
                                  a video with skeletons of them.')
 parser.add_argument('imgs_path', help='input image or directory of images')
+parser.add_argument('--img_ext', metavar='EXT', help='image extension', default='png')
 parser.add_argument('--out_dir', metavar='OUT_DIR', help='output directory name (not path) that will be places in ../res/.',
                     default='out')
-parser.add_argument('--img_ext', metavar='EXT', help='image extension', default='png')
 parser.add_argument('--premodel', metavar='MODEL',
                     help='Choose from \'acf\' or \'chk\' for Aggregated Channel Features and Checkerboard '
                          'filtered channel features respectevely.',
@@ -36,29 +37,10 @@ img_ext = args.img_ext
 out_dir_name = args.out_dir
 mode = args.premodel
 
+# Get images
 imgs = []
-
-toolbox = Toolbox()
-
-# if os.path.isdir(imgs_path):
-#     t.detect_parallel()
-
-
-# Save images' paths
-try:
-    for elem in list(os.listdir(imgs_path)):
-        splitting = elem.split('.')
-        if len(splitting) > 1 and splitting[1] == img_ext:
-            imgs.append(os.path.join(imgs_path, elem))
-except OSError:
-    if os.path.isfile(imgs_path):
-        file_name = os.path.basename(imgs_path)
-        splitting = file_name.split('.')
-        if len(splitting) > 1 and splitting[1] == img_ext:
-            imgs.append(os.path.join(imgs_path))
-    else:
-        print 'You must give a valid file/directory name'
-        exit(0)
+if not os.path.isfile(imgs_path):
+    imgs = glob.glob(os.path.join(imgs_path, '*.' + img_ext))
 
 splitting = None
 
@@ -67,12 +49,43 @@ res_path = '../res/'
 if not os.path.exists(res_path):
     os.mkdir(res_path)
 
+out_path = os.path.join(res_path, out_dir_name)
+
 # Apply detection and pose estimation for each image
-t = Toolbox()
+t = None  # = Toolbox()
 st = SkeletalTracker("./pose/pose_demo.py")
 
-out_path = os.path.join(res_path, out_dir_name)
-t.detect_parallel(imgs_path, out_path, mode='chk')
+# Detection
+if imgs:
+    pass
+    #t.detect_parallel(imgs_path, out_path, mode='chk')  # single file case
+else:
+    t.detect(imgs_path, out_path, 'chk')  # directory case
+
+# Get detection resutls
+det_imgs = glob.glob(os.path.join(out_path, "*.png"))
+bbs_list = glob.glob(os.path.join(out_path, "*_bbs.mat"))
+dirs = glob.glob(os.path.join(out_path, "*/"))
+i = 1
+
+# st.skeletonize('../res/terrace/2/1.png', ['--use_cpu'])  #, '--scales', '0.4', '0.3'])
+for d in dirs:
+    st.skeletonize(d, ['--use_cpu', '--scales', '0.4', '0.3'])
+    npzetas = glob.glob(os.path.join(d, '*.npz'))
+
+    # st.skeldraw(imgs_path,out_path, bbs_list, npzetas)
+    i += 1
+    if i == 3:
+        exit(0)
+
+
+
+# print imgs
+# print det_imgs
+# print dirs
+
+
+
 
 # SEQUENTIAL SOLUTION
 # rounds = 100
@@ -97,7 +110,7 @@ t.detect_parallel(imgs_path, out_path, mode='chk')
 #         break
 
 # Close the matlab engine
-t.close()
+#t.close()
 
 
 
