@@ -22,9 +22,11 @@ class Toolbox:
         det_num = 0
         if mode == 'acf':
             self.eng.addpath(self.eng.genpath('../toolbox/'))
+            print 'ACF MODE'
             det_num = 4
         elif mode == 'chk':
             self.eng.addpath(self.eng.genpath('../filtered-channel-features/'))
+            print 'CHK MODE'
             det_num = 7
         else:
             print 'Invalid mode. Choone one from \'acf\' (Aggregated Channel Features) and \'chk\' ' \
@@ -41,9 +43,11 @@ class Toolbox:
 
         det_num = 0
         if mode == 'acf':
+            print 'ACF MODE'
             self.eng.addpath(self.eng.genpath('../toolbox/'))
             det_num = 4
         elif mode == 'chk':
+            print 'CHK MODE'
             self.eng.addpath(self.eng.genpath('../filtered-channel-features/'))
             det_num = 7
         else:

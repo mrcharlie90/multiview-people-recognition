@@ -4,39 +4,59 @@
 #
 
 import os
-import numpy as np
 import argparse
 import glob
 
 from toolbox import Toolbox
 from skeltracker import SkeletalTracker
 
-##### Parsing #####
+""" Parsing """
 parser = argparse.ArgumentParser(usage='pose_this.py path/to/video.avi ',
-                                 description='Take a video with people moving and output \
-                                 a video with skeletons of them.')
-parser.add_argument('imgs_path', help='input image or directory of images')
-parser.add_argument('--img_ext', metavar='EXT', help='image extension', default='png')
-parser.add_argument('--out_dir', metavar='OUT_DIR', help='output directory name (not path) that will be places in ../res/.',
+                                 description='Multi-people pose estimation: apply a detection algorithm based on '
+                                             'Aggregated Channel Features [ACF] to one or a set of images and estimates '
+                                             'the relative pose.')
+parser.add_argument('imgs_path', help='Input image or a directory of images.')
+parser.add_argument('--img_ext', help='Image extension.', default='png')
+parser.add_argument('--detmodel', help='Choose one from \'acf\' (Aggregated Channel Features) or \'chk\' (Checkerboard'
+                                       ' Filtered Channel Features) respectevely.', default='chk')
+parser.add_argument('--out_dir',
+                    help='Output directory name (not path) that will be places in the result directory.',
                     default='out')
-parser.add_argument('--premodel', metavar='MODEL',
-                    help='Choose from \'acf\' or \'chk\' for Aggregated Channel Features and Checkerboard '
-                         'filtered channel features respectevely.',
-                    default='acf')
+parser.add_argument('--st',
+                    type=int,
+                    help='Choose one skeletal tracker among Belagiannis(1) and Deepcut(2)',
+                    default=1)
+parser.add_argument('--visualize',
+                    action='store_true',
+                    help='Whether to create a visualization of the pose. Default: True.',
+                    default=False)
+parser.add_argument('--scales',
+                    nargs='*',
+                    type=float,
+                    help='The scales to use, comma-separated. The most confident will be stored. Default: 1.',
+                    default=[1.])
+parser.add_argument('--use_cpu',
+                    action='store_true',
+                    help='Use CPU instead of GPU for predictions.',
+                    default=False)
+parser.add_argument('--gpu_id',
+                    help='GPU device id to use.',
+                    default=0)
 parser.add_argument('--version', action='version', version='%(prog)s 1.0')
 args = parser.parse_args()
-### End Parsing ###
-
-
-
-
-##### Main #####
 
 imgs_path = args.imgs_path
 img_ext = args.img_ext
-out_dir_name = args.out_dir
-mode = args.premodel
+out_dir = args.out_dir
+detmodel = args.detmodel
+visualize = args.visualize
+use_cpu = args.use_cpu
+scales = args.scales
+gpu_id = args.gpu_id
+st = args.st
+""" End Parsing """
 
+""" Main """
 # Get images
 imgs = []
 if not os.path.isfile(imgs_path):
@@ -49,36 +69,39 @@ res_path = '../res/'
 if not os.path.exists(res_path):
     os.mkdir(res_path)
 
-out_path = os.path.join(res_path, out_dir_name)
+out_path = os.path.join(res_path, out_dir)
 
 # Apply detection and pose estimation for each image
-t = None  # = Toolbox()
-st = SkeletalTracker("./pose/pose_demo.py")
+t = Toolbox()
+
 
 # Detection
 if imgs:
-    pass
-    #t.detect_parallel(imgs_path, out_path, mode='chk')  # single file case
+    t.detect_parallel(imgs_path, out_path, mode=detmodel)  # single file case
 else:
-    t.detect(imgs_path, out_path, 'chk')  # directory case
+    t.detect(imgs_path, out_path, detmodel)  # directory case
 
 # Get detection resutls
 det_imgs = glob.glob(os.path.join(out_path, "*.png"))
-bbs_list = glob.glob(os.path.join(out_path, "*_bbs.mat"))
+bbs_liskeltracker = glob.glob(os.path.join(out_path, "*_bbs.mat"))
 dirs = glob.glob(os.path.join(out_path, "*/"))
+
+# One image testing
+# skeltracker.skeletonize('../res/terrace/2/1.png', ['--use_cpu'])  #, '--scales', '0.4', '0.3'])
+skeltracker = SkeletalTracker("./pose/pose_demo.py")
 i = 1
+for folder in dirs:
+    if st == 1:
+        skeltracker.skeletonize_keypoint(folder, img_ext, use_cpu, visualize)
+    elif st == 2:
+        skeltracker.skeletonize_cnn(folder, img_ext, use_cpu, gpu_id, scales, visualize)
 
-# st.skeletonize('../res/terrace/2/1.png', ['--use_cpu'])  #, '--scales', '0.4', '0.3'])
-for d in dirs:
-    st.skeletonize(d, ['--use_cpu', '--scales', '0.4', '0.3'])
-    npzetas = glob.glob(os.path.join(d, '*.npz'))
-
-    # st.skeldraw(imgs_path,out_path, bbs_list, npzetas)
+    # npzetas = glob.glob(os.path.join(d, '*.npz'))
     i += 1
-    if i == 3:
+    if i == 10:
         exit(0)
 
-
+"""" End Main """
 
 # print imgs
 # print det_imgs
@@ -116,7 +139,7 @@ for d in dirs:
 
 
 
-### End Main ###
+
 
 # parser.add_argument('-o', metavar='name', nargs='?', help='output video file name')
 # parser.add_argument('-r', metavar='rate_value', nargs='?', default='1',
@@ -130,7 +153,7 @@ for d in dirs:
 
 
 
-##### Functions #####
+""" Functions """
 # def file_name(path):
 #     ''' Extract a filename from a given path, without extension. '''
 #     splitting = vin.split('/')
@@ -142,7 +165,7 @@ for d in dirs:
 #         os.mkdir(name)
 #     except OSError:
 #         pass
-### End Functions ###
+""" End Functions """
 
 
 
@@ -195,5 +218,5 @@ for d in dirs:
 #
 #
 #
-# ### End Main ###
+# """ End Main """
 #
