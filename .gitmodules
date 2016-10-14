@@ -4,3 +4,6 @@
 [submodule "deepcut-cnn"]
 	path = deepcut-cnn
 	url = https://github.com/eldar/deepcut-cnn.git
+[submodule "keypoint-matlab-demo"]
+	path = keypoint-matlab-demo
+	url = https://gitlab.com/vggdemo/keypoint_matlab_demo.git

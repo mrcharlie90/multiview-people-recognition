@@ -1,0 +1,4 @@
+# Git ignore for filtered channel features
+*.mexa64
+*.mexmaci64
+*.mexw64
