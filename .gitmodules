@@ -7,3 +7,6 @@
 [submodule "toolbox"]
 	path = toolbox
 	url = https://github.com/pdollar/toolbox.git
+[submodule "pose-hg-demo"]
+	path = pose-hg-demo
+	url = https://github.com/anewell/pose-hg-demo.git
