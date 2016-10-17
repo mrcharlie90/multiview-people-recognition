@@ -37,7 +37,8 @@ For each person pose annotations are added to the output videos.
 
 #### Notes:
 * The complete code of filtered channel features can be found [here](https://bitbucket.org/shanshanzhang/code_filteredchannelfeatures) (we use only the LCDF based ones)
-
+* Execute a bash clean.sh before run pose_this.py on a folder
+* When using deepcut-cnn try large scales values for small subjects
 
 ### work in progress...stay tuned!
 

@@ -79,8 +79,20 @@ class SkeletalTracker:
                 # colors = [[255, 0, 0], [0, 255, 0], [0, 0, 255], [0, 245, 255], [255, 131, 250], [255, 255, 0],
                 #          [255, 0, 0], [0, 255, 0], [0, 0, 255], [0, 245, 255], [255, 131, 250], [255, 255, 0],
                 #          [0, 0, 0], [255, 255, 255]]
-                color = [255, 0, 0]
                 for p_idx in range(14):
+                    color = [255, 255, 255]
+                    if p_idx == 6:
+                        color = [255, 0, 0]  # red
+                    if p_idx == 7:
+                            color = [0, 255, 0]  # green
+                    if p_idx == 8:
+                            color = [0, 0, 255]  # blue
+                    if p_idx == 9:
+                            color = [0, 255, 255]  # cyan
+                    if p_idx == 10:
+                        color = [255, 255, 0]  # yellow
+                    if p_idx == 11:
+                        color = [255, 0, 255]  # violet
                     self.skeldraw(skel, pose[0, p_idx], pose[1, p_idx], color)
 
                 skel_folder = os.path.join(dest_folder, 'skel')
@@ -108,5 +120,5 @@ class SkeletalTracker:
                                           + np.array(color).astype('float32')
                                           * (1.0 - alpha)).astype('uint8')
         except IndexError:
-            print 'Index Error Catched.'
+            pass
 

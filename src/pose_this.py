@@ -6,6 +6,8 @@
 import os
 import argparse
 import glob
+import texttable as tt
+
 
 from toolbox import Toolbox
 from skeltracker import SkeletalTracker
@@ -30,10 +32,14 @@ parser.add_argument('--visualize',
                     action='store_true',
                     help='Whether to create a visualization of the pose. Default: True.',
                     default=False)
+parser.add_argument('--nodetection',
+                    action='store_false',
+                    help='Set this flag to jump the detection step. Use this to speed up pose estimation debugging.',
+                    default=True)
 parser.add_argument('--scales',
                     nargs='*',
                     type=float,
-                    help='The scales to use, comma-separated. The most confident will be stored. Default: 1.',
+                    help='The scales to use in deepcut, space-separated. The most confident will be stored. Default: 1.',
                     default=[1.])
 parser.add_argument('--use_cpu',
                     action='store_true',
@@ -50,10 +56,31 @@ img_ext = args.img_ext
 out_dir = args.out_dir
 detmodel = args.detmodel
 visualize = args.visualize
+nodetection = args.nodetection
 use_cpu = args.use_cpu
 scales = args.scales
 gpu_id = args.gpu_id
 st = args.st
+
+tab = tt.Texttable()
+header = ['Options', 'Value']
+tab.header(header)
+row = ['Image Path', imgs_path]
+tab.add_row(row)
+row = ['Output Directory', out_dir]
+tab.add_row(row)
+row = ['Detection Model', detmodel]
+tab.add_row(row)
+st_name = ['Belagiannis2016', 'Eldar2016', 'Anewell2016']
+row = ['Skeletal Tracker', st_name[st-1]]
+tab.add_row(row)
+tab.set_cols_width([35, 35])
+tab.set_cols_align(['l', 'c'])
+tab.set_cols_valign(['m', 'm'])
+tab.set_chars(['-', '|', '+', '#'])
+s = tab.draw()
+print s
+
 """ End Parsing """
 
 """ Main """
@@ -61,8 +88,6 @@ st = args.st
 imgs = []
 if not os.path.isfile(imgs_path):
     imgs = glob.glob(os.path.join(imgs_path, '*.' + img_ext))
-
-splitting = None
 
 # Path where to store results
 res_path = '../res/'
@@ -72,24 +97,24 @@ if not os.path.exists(res_path):
 out_path = os.path.join(res_path, out_dir)
 
 # Apply detection and pose estimation for each image
-t = Toolbox()
+if nodetection:
+    t = Toolbox()
 
+    # Detection
+    if imgs:
+        t.detect_parallel(imgs_path, out_path, mode=detmodel)  # single file case
+    else:
+        t.detect(imgs_path, out_path, detmodel)  # directory case
 
-# Detection
 if imgs:
-    t.detect_parallel(imgs_path, out_path, mode=detmodel)  # single file case
+    dirs = glob.glob(os.path.join(out_path, '*/'))
 else:
-    t.detect(imgs_path, out_path, detmodel)  # directory case
-
-# Get detection resutls
-det_imgs = glob.glob(os.path.join(out_path, "*.png"))
-bbs_liskeltracker = glob.glob(os.path.join(out_path, "*_bbs.mat"))
-dirs = glob.glob(os.path.join(out_path, "*/"))
+    img_name = os.path.split(imgs_path)[1].split('.')[0]
+    dirs = glob.glob(os.path.join(out_path, img_name + '/'))
 
 # One image testing
 # skeltracker.skeletonize('../res/terrace/2/1.png', ['--use_cpu'])  #, '--scales', '0.4', '0.3'])
 skeltracker = SkeletalTracker("./pose/pose_demo.py")
-i = 1
 for folder in dirs:
     if st == 1:
         skeltracker.skeletonize_keypoint(folder, img_ext, use_cpu, visualize)
@@ -97,9 +122,6 @@ for folder in dirs:
         skeltracker.skeletonize_cnn(folder, img_ext, use_cpu, gpu_id, scales, visualize)
 
     # npzetas = glob.glob(os.path.join(d, '*.npz'))
-    i += 1
-    if i == 10:
-        exit(0)
 
 """" End Main """
 

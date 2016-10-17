@@ -7,14 +7,16 @@ class Toolbox:
 
     def __init__(self):
         """Open the engine and add paths"""
-        src_path = os.path.abspath('.')
+        self.eng = None
 
+
+    def detect(self, img_file, output_dir, mode='acf'):
+        """ Detect people and returns the directory where cropped images are stored."""
+        src_path = os.path.abspath('.')
         self.eng = matlab.engine.start_matlab()
         self.eng.addpath(src_path)
         self.eng.cd(src_path)
 
-    def detect(self, img_file, output_dir, mode='acf'):
-        """ Detect people and returns the directory where cropped images are stored."""
         if self.eng is None:
             print "Error: matlab engine not running. Create Toolbox() object first."
             exit(-1)
@@ -22,32 +24,33 @@ class Toolbox:
         det_num = 0
         if mode == 'acf':
             self.eng.addpath(self.eng.genpath('../toolbox/'))
-            print 'ACF MODE'
             det_num = 4
         elif mode == 'chk':
             self.eng.addpath(self.eng.genpath('../filtered-channel-features/'))
-            print 'CHK MODE'
             det_num = 7
         else:
             print 'Invalid mode. Choone one from \'acf\' (Aggregated Channel Features) and \'chk\' ' \
                   '(Checkerboard Filtered Channel Features)'
             exit(-1)
 
-        return self.eng.detector(img_file, output_dir, det_num, 10, 90.0, nargout=1)
+        return self.eng.detector(img_file, output_dir, '', det_num, 10, 90.0, nargout=1)
 
     def detect_parallel(self, input_dir, output_dir, ext='png', mode='acf'):
         """ Detecting people given a directory of frames """
+        src_path = os.path.abspath('.')
+        self.eng = matlab.engine.start_matlab()
+        self.eng.addpath(src_path)
+        self.eng.cd(src_path)
+
         if self.eng is None:
             print "Error: matlab engine not running. Create Toolbox() object first."
             exit(-1)
 
         det_num = 0
         if mode == 'acf':
-            print 'ACF MODE'
             self.eng.addpath(self.eng.genpath('../toolbox/'))
             det_num = 4
         elif mode == 'chk':
-            print 'CHK MODE'
             self.eng.addpath(self.eng.genpath('../filtered-channel-features/'))
             det_num = 7
         else:
