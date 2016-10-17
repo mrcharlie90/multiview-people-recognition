@@ -4,3 +4,6 @@
 [submodule "keypoint-matlab-demo"]
 	path = keypoint-matlab-demo
 	url = https://gitlab.com/vggdemo/keypoint_matlab_demo.git
+[submodule "toolbox"]
+	path = toolbox
+	url = https://github.com/pdollar/toolbox.git
