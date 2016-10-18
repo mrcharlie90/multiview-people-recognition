@@ -7,3 +7,6 @@
 [submodule "pose-hg-demo"]
 	path = pose-hg-demo
 	url = https://github.com/anewell/pose-hg-demo.git
+[submodule "keypoint-matlab"]
+	path = keypoint-matlab
+	url = https://gitlab.com/vggdemo/keypoint_matlab_demo.git
