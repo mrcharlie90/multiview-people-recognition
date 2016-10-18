@@ -20,8 +20,3 @@ data/**
 *.mexmaci64
 *.caffemodel
 *.t7
-filtered-channel-features
-deepcut-cnn
-keypoint-matlab
-pose-hg-demo
-toolbox
