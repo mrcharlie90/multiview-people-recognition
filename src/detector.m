@@ -36,16 +36,13 @@ function bbs_dir = detector(input_image, out_dir, out_filename, det_number, padd
     end
     
     [pathstr, filename, ext] = fileparts(input_image);
-    if strcmp(out_filename, '') == 1 
-        bbs_dir = [out_dir '/' filename '/'];
-        out_name = [out_dir '/' filename ext];
-        out_bbs_name = [out_dir '/' filename '_bbs'];
-    else
-        bbs_dir = [out_dir '/' out_filename '/'];
-        out_name = [out_dir '/' out_filename ext];
-        out_bbs_name = [out_dir '/' out_filename '_bbs'];
+    if strcmp(out_filename, '') ~= 1 
+        filename = out_filename;
     end
-    
+    out_name = [out_dir '/' filename ext];
+    out_bbs_name = [out_dir '/' filename '_bbs'];
+
+    bbs_dir = fullfile(out_dir, 'crops');
     if ~exist(bbs_dir, 'dir')
         mkdir(bbs_dir);
     end
@@ -93,7 +90,7 @@ function bbs_dir = detector(input_image, out_dir, out_filename, det_number, padd
     [patches, bb] = bbApply('crop', img, bbs);
     
     for i=1:length(patches)
-        patch_name = [bbs_dir int2str(i) ext];
+        patch_name = fullfile(bbs_dir,[filename '_' int2str(i) ext]);
         imwrite(patches{i}, patch_name);
     end
     

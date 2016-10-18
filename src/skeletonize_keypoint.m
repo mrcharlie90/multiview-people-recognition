@@ -7,21 +7,21 @@ if use_cpu == 1
 end
 
 % Default paths
-DEMO_BASEDIR = '../keypoint-matlab-demo';
+DEMO_BASEDIR = '../keypoint-matlab';
 DEMO_MODEL_FN = fullfile(DEMO_BASEDIR,'data','keypoint-v2.mat');
 MATCONVNET_DIR = fullfile(DEMO_BASEDIR, 'lib', 'matconvnet-custom');
 
 % Compile matconvnet
-if ~exist( fullfile(MATCONVNET_DIR, 'matlab', 'mex'), 'dir' )
-    disp('Compiling matconvnet ...')
-    addpath('./lib/matconvnet-custom/matlab');
-    if ( USE_GPU )
-        vl_compilenn('enableGpu', true);
-    else
-        vl_compilenn('enableGpu', false);
-    end
-    fprintf(1, '\n\nMatcovnet compilation finished.');
-end
+% if ~exist( fullfile(MATCONVNET_DIR, 'matlab', 'mex'), 'dir' )
+%     disp('Compiling matconvnet ...')
+%     addpath('./lib/matconvnet-custom/matlab');
+%     if ( USE_GPU )
+%         vl_compilenn('enableGpu', true);
+%     else
+%         vl_compilenn('enableGpu', false);
+%     end
+%     fprintf(1, '\n\nMatcovnet compilation finished.');
+% end
 
 % Setup matconvnet path variables
 matconvnet_setup_fn = fullfile(MATCONVNET_DIR, 'matlab', 'vl_setupnn.m');
@@ -39,15 +39,10 @@ if exist(in_path, 'dir')
     end
     folder = in_path;
 end
-
-out_name = fullfile(folder,'skel');
-if ~exist(out_name, 'dir')
-    mkdir(out_name);
-end
-
+% Initialize keypoint detector
+keypoint_detector = KeyPointDetector(DEMO_MODEL_FN, MATCONVNET_DIR, USE_GPU);
+    
 for k=1:size(images)
-    % Initialize keypoint detector
-    keypoint_detector = KeyPointDetector(DEMO_MODEL_FN, MATCONVNET_DIR, USE_GPU);
     
     % Detect keypoints
     img = images{k};
@@ -55,10 +50,15 @@ for k=1:size(images)
     fprintf(1, '\nDetecting keypoints in image : %s', img);
     
     % [kpx, kpy, kpname]
+    tic;
     [kpx, kpy, kpname] = get_all_keypoints(keypoint_detector, img);
-    
+    toc;
     % Display the keypoints
     if visualize 
+        out_name = fullfile(folder,'skel');
+        if ~exist(out_name, 'dir')
+            mkdir(out_name);
+        end
         in_img = imread(img);
         radius = ones(1, 16) * 3;
         plot_points = [kpx; kpy; radius]';

@@ -4,7 +4,7 @@
 % filtered channel features)
 % 
 % example:
-% detector_parallel('../data/terrace/', '../res/terrace/', 'png', 'chk', 10, 90);
+% detector_parallel('../data/terrace/', '../res/terrace/', 'png', 5, 10, 90);
 %
 function detector_parallel(in_path, out_path, in_ext, det_num, padding, thresh)
 %     in_path = '../data/terrace/';
@@ -21,6 +21,7 @@ function detector_parallel(in_path, out_path, in_ext, det_num, padding, thresh)
         mkdir(out_path);
     end
     
+    in_path
     filePattern = fullfile(in_path, ['*.' in_ext]);
     theFiles = dir(filePattern);
     
