@@ -17,8 +17,6 @@ data/**
 *.pyc
 *.txt
 *.mat
-*.mexmaci64
 models/ResNet-152.caffemodel
 !filtered-channel-features
-filtered-channel-features/**/*.mexmaci64
-
+*.mexmaci64
