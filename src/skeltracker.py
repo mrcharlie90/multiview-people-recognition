@@ -23,7 +23,7 @@ class SkeletalTracker:
         self.eng = matlab.engine.start_matlab()
         self.eng.addpath(src_path)
         self.eng.cd(src_path)
-        self.eng.addpath(self.eng.genpath('../keypoint-matlab-demo'))
+        self.eng.addpath(self.eng.genpath('../keypoint-matlab'))
 
         self.eng.skeletonize_keypoint(input_path, in_ext, use_cpu, visualize, nargout=0)
 

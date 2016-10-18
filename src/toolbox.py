@@ -27,7 +27,7 @@ class Toolbox:
             det_num = 4
         elif mode == 'chk':
             self.eng.addpath(self.eng.genpath('../filtered-channel-features/'))
-            det_num = 7
+            det_num = 5
         else:
             print 'Invalid mode. Choone one from \'acf\' (Aggregated Channel Features) and \'chk\' ' \
                   '(Checkerboard Filtered Channel Features)'
@@ -52,7 +52,7 @@ class Toolbox:
             det_num = 4
         elif mode == 'chk':
             self.eng.addpath(self.eng.genpath('../filtered-channel-features/'))
-            det_num = 7
+            det_num = 5
         else:
             print 'Invalid mode. Choone one from \'acf\' (Aggregated Channel Features) and \'chk\' ' \
                   '(Checkerboard Filtered Channel Features)'

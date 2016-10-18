@@ -36,6 +36,10 @@ parser.add_argument('--nodetection',
                     action='store_false',
                     help='Set this flag to jump the detection step. Use this to speed up pose estimation debugging.',
                     default=True)
+parser.add_argument('--noskel',
+                    action='store_false',
+                    help='Set this flag to jump the skeleton generation step. Use this to speed up pose estimation debugging.',
+                    default=True)
 parser.add_argument('--scales',
                     nargs='*',
                     type=float,
@@ -57,6 +61,7 @@ out_dir = args.out_dir
 detmodel = args.detmodel
 visualize = args.visualize
 nodetection = args.nodetection
+noskel = args.noskel
 use_cpu = args.use_cpu
 scales = args.scales
 gpu_id = args.gpu_id
@@ -102,9 +107,9 @@ if nodetection:
 
     # Detection
     if imgs:
-        t.detect_parallel(imgs_path, out_path, mode=detmodel)  # single file case
+        t.detect_parallel(imgs_path, out_path, mode=detmodel) # directory case
     else:
-        t.detect(imgs_path, out_path, detmodel)  # directory case
+        t.detect(imgs_path, out_path, detmodel)  # single file case
 
 if imgs:
     dirs = glob.glob(os.path.join(out_path, '*/'))
@@ -114,15 +119,15 @@ else:
 
 # One image testing
 # skeltracker.skeletonize('../res/terrace/2/1.png', ['--use_cpu'])  #, '--scales', '0.4', '0.3'])
-skeltracker = SkeletalTracker("./pose/pose_demo.py")
-for folder in dirs:
-    if st == 1:
-        skeltracker.skeletonize_keypoint(folder, img_ext, use_cpu, visualize)
-    elif st == 2:
-        skeltracker.skeletonize_cnn(folder, img_ext, use_cpu, gpu_id, scales, visualize)
+if noskel:
+    skeltracker = SkeletalTracker("./pose/pose_demo.py")
+    for folder in dirs:
+        if st == 1:
+            skeltracker.skeletonize_keypoint(folder, img_ext, use_cpu, visualize)
+        elif st == 2:
+            skeltracker.skeletonize_cnn(folder, img_ext, use_cpu, gpu_id, scales, visualize)
 
-    # npzetas = glob.glob(os.path.join(d, '*.npz'))
-
+        # npzetas = glob.glob(os.path.join(d, '*.npz'))
 """" End Main """
 
 # print imgs
