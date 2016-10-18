@@ -17,6 +17,11 @@ data/**
 *.pyc
 *.txt
 *.mat
-models/ResNet-152.caffemodel
-!filtered-channel-features
 *.mexmaci64
+*.caffemodel
+*.t7
+filtered-channel-features
+deepcut-cnn
+keypoint-matlab
+pose-hg-demo
+
