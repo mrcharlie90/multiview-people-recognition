@@ -51,9 +51,22 @@ for k=1:size(images)
     
     % [kpx, kpy, kpname]
     tic;
-    [kpx, kpy, kpname] = get_all_keypoints(keypoint_detector, img);
+    [kpx, kpy, kpname, occlusion] = get_all_keypoints(keypoint_detector, img);
     toc;
     % Display the keypoints
+%     if visualize 
+%         out_name = fullfile(folder,'skel');
+%         if ~exist(out_name, 'dir')
+%             mkdir(out_name);
+%         end
+%         in_img = imread(img);
+%         radius = ones(1, 16) * 3;
+%         plot_points = [kpx; kpy; radius]';
+%         skel = insertShape(in_img, 'FilledCircle', plot_points, 'Color', 'red');
+%         out_name = fullfile(folder, 'skel', [file_name '_skel' ext]);
+%         imwrite(skel, out_name);
+%     end
+
     if visualize 
         out_name = fullfile(folder,'skel');
         if ~exist(out_name, 'dir')
@@ -62,18 +75,35 @@ for k=1:size(images)
         in_img = imread(img);
         radius = ones(1, 16) * 3;
         plot_points = [kpx; kpy; radius]';
-        skel = insertShape(in_img, 'FilledCircle', plot_points, 'Color', 'red');
+        thresh = 7;
+        indeces_occluded = find(occlusion<=thresh);
+        indeces_visible = find(occlusion>thresh);
+        plot_occluded = plot_points(indeces_occluded, :);
+        plot_visible = plot_points(indeces_visible, :);
+        
+        display('Occluded:');
+        kpname(indeces_occluded)
+        display('Visible:');
+        kpname(indeces_visible)
+        %[plot_occluded occlusion(indeces_occluded)']
+        %[plot_visible occlusion(indeces_visible)']
+        
+        skel_occluded = insertShape(in_img, 'FilledCircle', plot_occluded, 'Color', 'red');
+        skel_visible = insertShape(skel_occluded, 'FilledCircle', plot_visible, 'Color', 'green');
         out_name = fullfile(folder, 'skel', [file_name '_skel' ext]);
-        imwrite(skel, out_name);
+        imshow(skel_visible);
+        
+        %imwrite(skel, out_name);
     end
     
     % Save results
-    pose = [kpx; kpy];
+    pose = [kpx; kpy; occlusion];
     
     out_name = fullfile(folder, file_name);
     save(out_name, 'pose');
     
     fprintf(' --> Done!');
+    k = waitforbuttonpress;
 end
 fprintf('\n');
 end % function

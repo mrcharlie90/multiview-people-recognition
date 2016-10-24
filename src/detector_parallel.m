@@ -25,15 +25,13 @@ function detector_parallel(in_path, out_path, in_ext, det_num, padding, thresh)
     filePattern = fullfile(in_path, ['*.' in_ext]);
     theFiles = dir(filePattern);
     
-    poolobj = gcp('nocreate');
-    if size(poolobj) == 0
-        poolobj = parpool;
-    end
+    
     % Parallel detection
-    parfor i=1:length(theFiles)
+    l = length(theFiles);
+    parfor i=1:l
         baseFileName = theFiles(i).name;
         fullFileName = fullfile(in_path, baseFileName);
-        detector(fullFileName, out_path, int2str(i), det_num, padding, thresh);
+        detector(fullFileName, out_path, i-1, det_num, padding, thresh);
     end
-    delete(poolobj);
+    
 end

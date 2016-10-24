@@ -5,13 +5,13 @@
 %
 % images_path : path to the image
 % output_dir : path where to store the results
-% out_name : where the cropped detection are stored
+% out_name : insert a number for example 1
 % det_number : detection number
 % padding : resize all rectangles detected adding this value
 % thresh : selects rectangles with score >= thresh
 %
 % example:
-% detector('../data/terrace/terrace1-c0-026.png', '../res/terrace', '1', 7, 10, 90.0);
+% detector('../data/terrace/terrace1-c0-026.png', '../res/terrace', 1, 7, 10, 90.0);
 %
 function bbs_dir = detector(input_image, out_dir, out_filename, det_number, padding, thresh)
     % Pre-trained models
@@ -36,11 +36,10 @@ function bbs_dir = detector(input_image, out_dir, out_filename, det_number, padd
     end
     
     [pathstr, filename, ext] = fileparts(input_image);
-    if strcmp(out_filename, '') ~= 1 
-        filename = out_filename;
-    end
+    
+    filename = sprintf('%04d', out_filename);
     out_name = [out_dir '/' filename ext];
-    out_bbs_name = [out_dir '/' filename '_bbs'];
+    out_bbs_name = [out_dir '/' 'bbs_' filename];
 
     bbs_dir = fullfile(out_dir, 'crops');
     if ~exist(bbs_dir, 'dir')
@@ -61,35 +60,39 @@ function bbs_dir = detector(input_image, out_dir, out_filename, det_number, padd
     bbs = bbs(bbs(:,5) > thresh, :);
     
     % Remove overlapping rectangles
-    [rows cols] = size(bbs);
-    w = 3; % width 
-    h = 4; % height
-    selection = ones(rows, 1);
-    for i=1:rows
-        for j=i+1:rows
-            ratio = bboxOverlapRatio(bbs(i,1:4),bbs(j,1:4));
-            if ratio > 0.50
-                if (bbs(i,w) * bbs(i, h)) > (bbs(j, w) * bbs(j,h))
-                    selection(j) = 0;
-                else
-                    selection(i) = 0;
-                end
-            end
-        end
-    end
+%     [rows cols] = size(bbs);
+%     w = 3; % width 
+%     h = 4; % height
+%     selection = ones(rows, 1);
+%     for i=1:rows
+%         for j=i+1:rows
+%             ratio = bboxOverlapRatio(bbs(i,1:4),bbs(j,1:4));
+%             if ratio > 0.40
+%                 if (bbs(i,w) * bbs(i, h)) > (bbs(j, w) * bbs(j,h))
+%                     selection(j) = 0;
+%                 else
+%                     selection(i) = 0;
+%                 end
+%             end
+%         end
+%     end
+%     
+%     % Select only one between overlapping rects
+%     bbs = bbs(selection>0, :);
     
-    % Select only one between overlapping rects
-    bbs = bbs(selection>0, :);
     
-    % Save the image
-    img_out = bbApply('embed', img, bbs, 'col', [0 255 0]);
-    imwrite(img_out, out_name);
-    save(out_bbs_name, 'bbs');
     
     % Crop and save patches
     [patches, bb] = bbApply('crop', img, bbs);
     
-    for i=1:length(patches)
+    % Save the image
+    img_out = bbApply('embed', img, bb, 'col', [0 255 0]);
+    
+    imwrite(img_out, out_name);
+    save(out_bbs_name, 'bb');
+    
+    l = length(patches);
+    for i=1:l
         patch_name = fullfile(bbs_dir,[filename '_' int2str(i) ext]);
         imwrite(patches{i}, patch_name);
     end
