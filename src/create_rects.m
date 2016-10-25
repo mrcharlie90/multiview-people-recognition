@@ -1,7 +1,7 @@
 gt_path = '../data/campus/';
 actorsGT = load(fullfile(gt_path, 'actorsGT.mat'));
 actorsGT = actorsGT.actor2D
-cameras = {'Camera0' 'Camera1' 'Camera2'};
+cameras = {'Camera0' 'Camera1' 'Camera2' 'Camera3' 'Camera4'};
 camera_index = 1;
 pattern = fullfile(gt_path,cameras{camera_index}, '*.png');
 images_paths = dir(pattern)

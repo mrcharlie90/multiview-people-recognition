@@ -1,37 +1,31 @@
-% Apply the detector algorithm to all images (with extension in_ext)
-% contained into the in_path directory. Select the specific model by
-% choosing from 'acf' (aggregated channel features) and 'chk' (checkerboard 
-% filtered channel features)
-% 
-% example:
-% detector_parallel('../data/terrace/', '../res/terrace/', 'png', 5, 10, 90);
-%
-function detector_parallel(in_path, out_path, in_ext, det_num, padding, thresh)
-%     in_path = '../data/terrace/';
-%     in_ext = 'png';
-%     out_path = '../res/terrace/';
-%     mode = 'chk';
-    
-    if ~exist(in_path, 'dir')
-        display('Invalid input folder.');
-    end
-    
-     % Checking if the output dir exists
-    if ~exist(out_path, 'dir')
-        mkdir(out_path);
-    end
-    
-    in_path
-    filePattern = fullfile(in_path, ['*.' in_ext]);
-    theFiles = dir(filePattern);
-    
-    
-    % Parallel detection
-    l = length(theFiles);
-    parfor i=1:l
-        baseFileName = theFiles(i).name;
-        fullFileName = fullfile(in_path, baseFileName);
-        detector(fullFileName, out_path, i-1, det_num, padding, thresh);
-    end
-    
+function detector_parallel(in, out, start, stop, det_num, padding, thresh)
+% Apply the detection function on a set of images 
+% contained into one folder (png).
+% usage:
+% detector_parallel('../data/campus/Camera0/', '../res/campus/Camera0/', 170, 1787, 5, 10, 80.0)
+
+% Directory check
+if ~exist(in, 'dir')
+    error('Input folder is not valid.');
+end
+
+pattern = fullfile(in, '*.png');
+files = dir(pattern);
+
+% Parallel detections
+assert(start < stop)
+n = length(files);
+if stop > n
+    stop = n;
+end
+if start < 0
+    start = 0;
+end
+display(['Paralell detection at ' in]);
+parfor i=start:stop
+    img_path = fullfile(in, files(i).name);
+    detector(img_path, out, det_num, padding, thresh);
+end
+
+fprintf(' --> Done!\n');
 end

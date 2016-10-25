@@ -1,7 +1,6 @@
-function belagiannis()
-clc; clear;
+function belagiannis(crops_path)
 % Future params
-crops_path = '../data/campus/Camera1/camera1_crops';
+%crops_path = '../data/iaslab/gianluca_sync/Camera0/crops';
 res_path = fullfile(crops_path, 'belagiannis');
 use_cpu = 1;
 
@@ -34,7 +33,7 @@ images = dir(pattern);
 % Foreach crop compute the skeleton
 radius = ones(1, 16) * 3;
 thresh = 7;
-l = length(images);
+l = length(images)
 for i=1:l
     display(images(i).name);
     % Getting the keypoints
@@ -59,7 +58,6 @@ for i=1:l
         % [x y 0/1 confidence]
         pose = [kpx; kpy; occlusion_marks; occlusion]';
 
-        
         imwrite(img, out_name);
         [~, name, ~] = fileparts(images(i).name);
 
