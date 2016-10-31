@@ -18,8 +18,8 @@ n = length(files);
 if stop > n
     stop = n;
 end
-if start < 0
-    start = 0;
+if start <= 0
+    start = 1;
 end
 display(['Paralell detection at ' in]);
 parfor i=start:stop
