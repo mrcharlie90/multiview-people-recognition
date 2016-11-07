@@ -41,7 +41,7 @@ if ~exist(out, 'dir')
     error('Directory is not valid.');
 end
 
-crops_dir = fullfile(out, strcat(mode, '_crops'));
+crops_dir = fullfile(out, 'crops');
 if ~exist(crops_dir, 'dir')
     mkdir(crops_dir);
 end
@@ -49,7 +49,7 @@ end
 
 % Matches ddddd.png or dddddd.png names
 [~, filename, ext] = fileparts(in);
-newname = regexp(filename, '(\d{5}|\d{6})$', 'match');
+newname = regexp(filename, '(\d{6}|\d{5})$', 'match');
 newname = newname{1};
 
 % Read the image and detect people
@@ -66,22 +66,16 @@ bbs = bbs + pad;
 bbs = bbs(bbs(:,5) > thresh, :);
 
 % Crop and save patches
-[crops, bb] = bbApply('crop', img, bbs);
+[crops, rect] = bbApply('crop', img, bbs);
 
 % Save the image
-img_out = bbApply('embed', img, bb, 'col', [0 255 0]);
-det_image_name = fullfile(out, strcat(newname, '.jpeg'));
+img_out = bbApply('embed', img, rect, 'col', [0 255 0]);
+det_image_name = fullfile(crops_dir, strcat(newname, '.jpeg'));
 imwrite(img_out, det_image_name);
 
 % Save bbs
-bbs_name = fullfile(out, strcat(newname, '-bbs'));
-save(bbs_name, 'bb');
-
-l = length(crops);
-for i=1:l
-    patch_name = fullfile(crops_dir,[newname '-' int2str(i) ext]);
-    imwrite(crops{i}, patch_name);
-end
+bbs_name = fullfile(crops_dir, newname);
+save(bbs_name, 'rect');
 
 end % detector
     
