@@ -46,18 +46,23 @@ function load_bbs_data(path, value)
 
 	-- Load 
 	local tensors = matio.load(path)
-	local bbs = tensors['bb']
+	
+	--local bbs = tensors['bb']
+	local bbs = tensors['rect']
 	local centers = {}
 	local scales = {}
 
-	-- Computing centers and scales for each bbs
+	if bbs:sum() == 0 then
+		return nil
+	end
 
+	-- Computing centers and scales for each bbs
 	if pcall(function()
 			for i=1,bbs:size(1) do
 
 			local x, y = bbs[i][1], bbs[i][2]
 			local w, h = bbs[i][3], bbs[i][4]
-			local score = bbs[i][5]
+			--local score = bbs[i][5]
 
 			local area = w * h
 			--print(area)
@@ -81,7 +86,7 @@ end
 
 
 
-function pose_estimation(dir1, dir2, value)
+function pose_estimation(dir1, dir2, regexp, value)
 	--local mats_dir = 'data/detections/campus_camera0/'
 	--local images_dir = 'data/campus/Camera0/'
 	local mats_dir = dir1
@@ -113,6 +118,8 @@ function pose_estimation(dir1, dir2, value)
 	
 	for i,im in ipairs(images) do
 		local bbs, centers, scales = load_bbs_data(mats_paths[i], value)
+		name = string.match(images_paths[i], regexp)
+		
 		-- Checking bbs is valid
 		if bbs then
 			-- Skeletons relative to the original image and relative to the heatmaps
@@ -127,8 +134,8 @@ function pose_estimation(dir1, dir2, value)
 				local cropped_img = crop(im, centers[j], scales[j], 0, 256)
 				--ti = os.clock()
 				----------------------------------------------------------
-				out = m:forward(cropped_img:view(1,3,256,256):cuda())
-				cutorch.synchronize()
+				--out = m:forward(cropped_img:view(1,3,256,256):cuda())
+				--cutorch.synchronize()
 				----------------------------------------------------------
 				--tf = os.clock()
 				--print(string.format("time: %.5f\n", tf-ti))
@@ -158,8 +165,7 @@ function pose_estimation(dir1, dir2, value)
 			end -- endfor
 
 			-- Saving results
-			local out_name = paths.concat(anewell_path, string.format('%04d',i))
-
+			local out_name = paths.concat(anewell_path, name)
 			torch.save(out_name .. '_kpimg.t7', skels_img)
 			torch.save(out_name .. '_kphm.t7', skels_hm)
 			torch.save(out_name .. '_hm.t7', heatmaps)
@@ -167,9 +173,38 @@ function pose_estimation(dir1, dir2, value)
 			torch.save(out_name .. '_s.t7', scales)
 			image.save(out_name .. '.jpeg', img_out)
 		end -- endif
+
 	end -- endfor
 	print('done!')
 end
+
+--pose_estimation('data/campus/Camera0/crops','data/campus/Camera0/', 4)
+--pose_estimation('data/campus/Camera1/crops','data/campus/Camera1/', 4)
+--pose_estimation('data/campus/Camera2/crops','data/campus/Camera2/', 4)
+pose_estimation('../data/campus/Camera0/crops','data/campus/Camera0/', "%d%d%d%d%d", 4)
+pose_estimation('../data/campus/Camera1/crops','data/campus/Camera1/', "%d%d%d%d%d", 4)
+pose_estimation('res/campus/Camera2/crops','data/campus/Camera2/', "%d%d%d%d%d", 4)
+--[[pose_estimation('data/shelf/Camera0/crops','data/shelf/Camera0/', 1)
+pose_estimation('data/shelf/Camera1/crops','data/shelf/Camera1/', 1)
+pose_estimation('data/shelf/Camera2/crops','data/shelf/Camera2/', 1)
+pose_estimation('data/shelf/Camera3/crops','data/shelf/Camera3/', 1)
+pose_estimation('data/shelf/Camera4/crops','data/shelf/Camera4/', 1)--]]
+
+--pose_estimation('data/iaslab/gianluca_sync/Camera0/crops','data/iaslab/gianluca_sync/Camera0/', 1)
+
+
+--[[pose_estimation('data/iaslab/gianluca_sync/Camera0/crops','data/iaslab/gianluca_sync/Camera0/', 1)
+pose_estimation('data/iaslab/gianluca_sync/Camera0/crops','data/iaslab/gianluca_sync/Camera0/', 1)
+pose_estimation('data/iaslab/gianluca_sync/Camera0/crops','data/iaslab/gianluca_sync/Camera0/', 1)
+pose_estimation('data/iaslab/marco_sync/Camera1/crops','data/iaslab/marco_sync/Camera1/', 1)
+pose_estimation('data/iaslab/marco_sync/Camera1/crops','data/iaslab/marco_sync/Camera1/', 1)
+pose_estimation('data/iaslab/marco_sync/Camera1/crops','data/iaslab/marco_sync/Camera1/', 1)
+
+pose_estimation('data/iaslab/matteol_sync/Camera2/crops','data/iaslab/matteol_sync/Camera2/', 1)
+pose_estimation('data/iaslab/matteom_sync/Camera3/crops','data/iaslab/matteom_sync/Camera3/', 1)
+pose_estimation('data/iaslab/nicola_sync/Camera4/crops','data/iaslab/nicola_sync/Camera4/', 1)
+pose_estimation('data/iaslab/stefanog_sync/Camera4/crops','data/iaslab/stefanog_sync/Camera4/', 1)
+pose_estimation('data/iaslab/stefanom_sync/Camera4/crops','data/iaslab/stefanom_sync/Camera4/', 1)]]--
 
 --pose_estimation('data/detections/campus_camera0/','data/campus/Camera0/', 4)
 --[[pose_estimation('data/detections/campus_camera1/','data/campus/Camera1/', 4)
